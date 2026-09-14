@@ -51,10 +51,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun AppTheme(content: @Composable () -> Unit) {
     val dark = isSystemInDarkTheme()
-    MaterialTheme(
-        colorScheme = if (dark) darkColorScheme(primary = DarkPrimary, secondary = Orange) else lightColorScheme(primary = Primary, secondary = Orange),
-        content = content
-    )
+    MaterialTheme(colorScheme = if (dark) darkColorScheme(primary = DarkPrimary, secondary = Orange) else lightColorScheme(primary = Primary, secondary = Orange), content = content)
 }
 
 @Composable
@@ -76,12 +73,7 @@ private fun App(repo: Cet4Repository) {
         }
         NavigationBar(Modifier.navigationBarsPadding(), containerColor = MaterialTheme.colorScheme.surface.copy(alpha = .94f)) {
             listOf(Icons.Default.Home to "首页", Icons.Default.CalendarMonth to "日历", Icons.Default.MenuBook to "题库", Icons.Default.Person to "我的").forEachIndexed { i, item ->
-                NavigationBarItem(
-                    selected = tab == i,
-                    onClick = { tab = i },
-                    icon = { val s by animateFloatAsState(if (tab == i) 1.08f else 1f, spring(), label = "nav"); Icon(item.first, contentDescription = item.second, modifier = Modifier.scale(s)) },
-                    label = { Text(text = item.second) }
-                )
+                NavigationBarItem(selected = tab == i, onClick = { tab = i }, icon = { val s by animateFloatAsState(if (tab == i) 1.08f else 1f, spring(), label = "nav"); Icon(item.first, contentDescription = item.second, modifier = Modifier.scale(s)) }, label = { Text(text = item.second) })
             }
         }
     }
@@ -99,7 +91,7 @@ private fun Home(tasks: List<DayTaskEntity>, toggle: (DayTaskEntity) -> Unit) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(text = "90天备考计划 · 第$day天", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = "90天备考计划 · 第" + day + "天", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(text = "今天也向四级靠近一点", fontSize = 25.sp, fontWeight = FontWeight.Bold)
                 }
                 Box(Modifier.size(44.dp).background(Primary.copy(alpha = .12f), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) { Text(text = "四", color = Primary, fontWeight = FontWeight.Bold) }
@@ -110,7 +102,7 @@ private fun Home(tasks: List<DayTaskEntity>, toggle: (DayTaskEntity) -> Unit) {
                 Column(Modifier.padding(20.dp)) {
                     Text(text = "距离 CET-4 考试", fontSize = 13.sp, color = Color.White.copy(alpha = .82f))
                     Text(text = "$left 天", fontSize = 39.sp, color = Color.White, fontWeight = FontWeight.Bold)
-                    Text(text = "基础攻坚期 · 第$day天", fontSize = 13.sp, color = Color.White.copy(alpha = .9f))
+                    Text(text = "基础攻坚期 · 第" + day + "天", fontSize = 13.sp, color = Color.White.copy(alpha = .9f))
                     Spacer(Modifier.height(14.dp))
                     LinearProgressIndicator(progress = { day / 90f }, modifier = Modifier.fillMaxWidth().height(7.dp), color = Color.White, trackColor = Color.White.copy(alpha = .22f))
                 }
@@ -160,15 +152,8 @@ private fun Library() {
         item { Text(text = "学习题库", fontSize = 28.sp, fontWeight = FontWeight.Bold); Text(text = "资料 · 方法 · 模考 · 错题", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .55f), RoundedCornerShape(18.dp)).padding(4.dp)) { sections.forEachIndexed { i, s -> Box(Modifier.weight(1f).combinedClickable(onClick = { section = i }, onLongClick = {}).background(if (i == section) Primary else Color.Transparent, RoundedCornerShape(15.dp)).padding(vertical = 11.dp), contentAlignment = Alignment.Center) { Text(text = s, fontSize = 12.sp, color = if (i == section) Color.White else MaterialTheme.colorScheme.onSurfaceVariant) } } } }
         when (section) {
-            0 -> {
-                item { Text(text = "大雁四级资料", fontSize = 18.sp, fontWeight = FontWeight.Bold) }
-                items(listOf("词汇", "听力", "阅读", "写作翻译")) { name -> Card(shape = RoundedCornerShape(22.dp)) { Column(Modifier.padding(16.dp)) { Text(text = "大雁四级 · $name", fontWeight = FontWeight.SemiBold); Spacer(Modifier.height(9.dp)); Text(text = "进度 0% · 等待真实资料导入", fontSize = 12.sp, color = Primary) } } }
-                item { Card(shape = RoundedCornerShape(20.dp)) { Text(text = "墨墨背单词 · 本地进度同步入口", modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
-            }
-            1 -> {
-                item { Text(text = "六大题型方法", fontSize = 18.sp, fontWeight = FontWeight.Bold) }
-                items(listOf("听力", "阅读", "选词", "匹配", "翻译", "写作")) { type -> var open by remember { mutableStateOf(false) }; Card(Modifier.fillMaxWidth().combinedClickable(onClick = { open = !open }, onLongClick = {}), shape = RoundedCornerShape(20.dp)) { Column(Modifier.padding(16.dp)) { Row { Text(text = type, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f)); Text(text = if (open) "收起" else "展开", fontSize = 12.sp, color = Primary) }; AnimatedVisibility(open) { Text(text = "方法内容必须根据你提供的大雁四级资料填充，当前不虚构教材内容。", modifier = Modifier.padding(top = 10.dp), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) } } } }
-            }
+            0 -> { item { Text(text = "大雁四级资料", fontSize = 18.sp, fontWeight = FontWeight.Bold) }; items(listOf("词汇", "听力", "阅读", "写作翻译")) { name -> Card(shape = RoundedCornerShape(22.dp)) { Column(Modifier.padding(16.dp)) { Text(text = "大雁四级 · $name", fontWeight = FontWeight.SemiBold); Spacer(Modifier.height(9.dp)); Text(text = "进度 0% · 等待真实资料导入", fontSize = 12.sp, color = Primary) } } }; item { Card(shape = RoundedCornerShape(20.dp)) { Text(text = "墨墨背单词 · 本地进度同步入口", modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurfaceVariant) } } }
+            1 -> { item { Text(text = "六大题型方法", fontSize = 18.sp, fontWeight = FontWeight.Bold) }; items(listOf("听力", "阅读", "选词", "匹配", "翻译", "写作")) { type -> var open by remember { mutableStateOf(false) }; Card(Modifier.fillMaxWidth().combinedClickable(onClick = { open = !open }, onLongClick = {}), shape = RoundedCornerShape(20.dp)) { Column(Modifier.padding(16.dp)) { Row { Text(text = type, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f)); Text(text = if (open) "收起" else "展开", fontSize = 12.sp, color = Primary) }; AnimatedVisibility(open) { Text(text = "方法内容必须根据你提供的大雁四级资料填充，当前不虚构教材内容。", modifier = Modifier.padding(top = 10.dp), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) } } } } }
             2 -> item { Card(shape = RoundedCornerShape(24.dp)) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { Text(text = "离线模拟考试", fontSize = 20.sp, fontWeight = FontWeight.Bold); Text(text = "计时、作答、交卷、评分、错题收录框架已预留。", color = MaterialTheme.colorScheme.onSurfaceVariant); Text(text = "当前：真实题库未导入", fontWeight = FontWeight.SemiBold, color = Orange) } } }
             else -> item { Card(shape = RoundedCornerShape(24.dp)) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { Text(text = "错题复盘", fontSize = 20.sp, fontWeight = FontWeight.Bold); Text(text = "暂无错题。完成真实模考后自动收录。", color = MaterialTheme.colorScheme.onSurfaceVariant); Text(text = "趋势图：等待模考记录", fontSize = 13.sp, color = Primary) } } }
         }
