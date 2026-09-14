@@ -212,7 +212,7 @@ private fun LibraryScreen() {
 private fun ProfileScreen() {
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("我的", 28.sp, fontWeight = FontWeight.Bold); Text("学习统计与设置", 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        item { Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) { StatCard("学习天数", "0"); StatCard("完成任务", "0"); StatCard("模考次数", "0") } }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) { StatCard("学习天数", "0", Modifier.weight(1f)); StatCard("完成任务", "0", Modifier.weight(1f)); StatCard("模考次数", "0", Modifier.weight(1f)) } }
         item { SettingCard("深色模式", "跟随系统") }
         item { SettingCard("动画效果", "开启") }
         item { SettingCard("备考起始时间", "2026-09-14") }
@@ -222,8 +222,8 @@ private fun ProfileScreen() {
 }
 
 @Composable
-private fun StatCard(label: String, value: String) {
-    Card(Modifier.weight(1f), shape = RoundedCornerShape(20.dp)) { Column(Modifier.padding(14.dp)) { Text(value, 23.sp, fontWeight = FontWeight.Bold, color = Primary); Text(label, 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+private fun StatCard(label: String, value: String, modifier: Modifier) {
+    Card(modifier, shape = RoundedCornerShape(20.dp)) { Column(Modifier.padding(14.dp)) { Text(value, 23.sp, fontWeight = FontWeight.Bold, color = Primary); Text(label, 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
 }
 
 @Composable
