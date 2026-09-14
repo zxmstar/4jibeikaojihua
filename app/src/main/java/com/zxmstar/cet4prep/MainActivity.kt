@@ -48,7 +48,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -78,19 +82,15 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun CET4Theme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme.copy(primary = Primary, secondary = Highlight),
-        content = content
-    )
+    MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(primary = Primary, secondary = Highlight), content = content)
 }
 
 @Composable
 private fun CET4App(repository: Cet4Repository) {
     val scope = rememberCoroutineScope()
-    val tasks by repository.observeToday().collectAsStateCompat()
-    var selectedTab by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0) }
+    val tasks by repository.observeToday().collectAsState(initial = emptyList())
+    var selectedTab by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) { repository.seedToday() }
-
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f)) {
             AnimatedContent(targetState = selectedTab, label = "tab") { tab ->
@@ -129,12 +129,7 @@ private fun HomeScreen(tasks: List<DayTaskEntity>, onTaskClick: (DayTaskEntity) 
     val remaining = ChronoUnit.DAYS.between(today, exam).coerceAtLeast(0)
     val progress = day / 90f
     val completed = tasks.count { it.completed }
-
-    LazyColumn(
-        Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp),
-        contentPadding = PaddingValues(top = 18.dp, bottom = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp), contentPadding = PaddingValues(top = 18.dp, bottom = 18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -157,20 +152,12 @@ private fun HomeScreen(tasks: List<DayTaskEntity>, onTaskClick: (DayTaskEntity) 
                 }
             }
         }
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("今日任务", 19.sp, fontWeight = FontWeight.Bold, Modifier.weight(1f))
-                Text("$completed / ${tasks.size} 项", 13.sp, color = Primary)
-            }
-        }
+        item { Row(verticalAlignment = Alignment.CenterVertically) { Text("今日任务", 19.sp, fontWeight = FontWeight.Bold, Modifier.weight(1f)); Text("$completed / ${tasks.size} 项", 13.sp, color = Primary) } }
         items(tasks, key = { it.title }) { task -> TaskCard(task, onTaskClick) }
         item {
             AnimatedVisibility(completed == tasks.size && tasks.isNotEmpty(), enter = fadeIn() + scaleIn(), exit = fadeOut()) {
                 Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Highlight.copy(alpha = .12f))) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Check, null, tint = Highlight)
-                        Spacer(Modifier.width(10.dp)); Text("今日学习完成，保持这个节奏。")
-                    }
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Check, null, tint = Highlight); Spacer(Modifier.width(10.dp)); Text("今日学习完成，保持这个节奏。") }
                 }
             }
         }
@@ -179,22 +166,14 @@ private fun HomeScreen(tasks: List<DayTaskEntity>, onTaskClick: (DayTaskEntity) 
 
 @Composable
 private fun TaskCard(task: DayTaskEntity, onClick: (DayTaskEntity) -> Unit) {
-    var pressed by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var pressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(if (pressed) .96f else 1f, spring(), label = "press")
     val accent = if (task.title.contains("听力")) Highlight else Primary
-    Card(
-        Modifier.fillMaxWidth().scale(scale).combinedClickable(onClick = { pressed = false; onClick(task) }, onLongClick = { pressed = false }),
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(1.dp)
-    ) {
+    Card(Modifier.fillMaxWidth().scale(scale).combinedClickable(onClick = { pressed = false; onClick(task) }, onLongClick = { pressed = false }), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(1.dp)) {
         Row(Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(4.dp).height(43.dp).background(accent, RoundedCornerShape(8.dp)))
             Spacer(Modifier.width(13.dp))
-            Column(Modifier.weight(1f)) {
-                Text(task.title, 15.sp, fontWeight = FontWeight.SemiBold)
-                Text(task.detail, Modifier.padding(top = 5.dp), 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+            Column(Modifier.weight(1f)) { Text(task.title, 15.sp, fontWeight = FontWeight.SemiBold); Text(task.detail, Modifier.padding(top = 5.dp), 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             Text(if (task.completed) "✓" else task.duration, color = if (task.completed) Primary else MaterialTheme.colorScheme.onSurfaceVariant, fontSize = if (task.completed) 22.sp else 11.sp, fontWeight = FontWeight.Bold)
         }
     }
@@ -203,35 +182,16 @@ private fun TaskCard(task: DayTaskEntity, onClick: (DayTaskEntity) -> Unit) {
 @Composable
 private fun CalendarScreen() {
     val tabs = listOf("基础攻坚期", "题型强化期", "冲刺模考期")
-    var selected by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0) }
+    var selected by remember { mutableStateOf(0) }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("备考日历", 28.sp, fontWeight = FontWeight.Bold); Text("90天阶段规划", 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item {
             Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .55f), RoundedCornerShape(18.dp)).padding(4.dp)) {
-                tabs.forEachIndexed { i, title ->
-                    Box(Modifier.weight(1f).background(if (i == selected) Primary else Color.Transparent, RoundedCornerShape(15.dp)).combinedClickable(onClick = { selected = i }, onLongClick = {} ).padding(vertical = 11.dp), Alignment.Center) {
-                        Text(title, fontSize = 12.sp, color = if (i == selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
+                tabs.forEachIndexed { i, title -> Box(Modifier.weight(1f).background(if (i == selected) Primary else Color.Transparent, RoundedCornerShape(15.dp)).combinedClickable(onClick = { selected = i }, onLongClick = {}).padding(vertical = 11.dp), Alignment.Center) { Text(title, fontSize = 12.sp, color = if (i == selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant) } }
             }
         }
-        item {
-            Card(shape = RoundedCornerShape(24.dp)) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("第${selected + 1}阶段", 18.sp, fontWeight = FontWeight.Bold)
-                    Text(if (selected == 0) "建立词汇、听力与阅读基础" else if (selected == 1) "围绕题型进行专项强化" else "模拟考试、错题复盘与冲刺", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("点击具体日期后查看当天任务", 13.sp, color = Primary)
-                }
-            }
-        }
-        items((1..7).toList()) { day ->
-            Card(shape = RoundedCornerShape(20.dp)) {
-                Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("周$day", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                    Text(if (day == 1) "今日" else "备考计划", 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
+        item { Card(shape = RoundedCornerShape(24.dp)) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { Text("第${selected + 1}阶段", 18.sp, fontWeight = FontWeight.Bold); Text(if (selected == 0) "建立词汇、听力与阅读基础" else if (selected == 1) "围绕题型进行专项强化" else "模拟考试、错题复盘与冲刺", color = MaterialTheme.colorScheme.onSurfaceVariant); Text("点击具体日期后查看当天任务", 13.sp, color = Primary) } } }
+        items((1..7).toList()) { week -> Card(shape = RoundedCornerShape(20.dp)) { Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Text("第 $week 周", fontWeight = FontWeight.Bold, Modifier.weight(1f)); Text(if (week == 1) "当前" else "备考计划", 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) } } }
     }
 }
 
@@ -242,17 +202,9 @@ private fun LibraryScreen() {
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("学习题库", 28.sp, fontWeight = FontWeight.Bold); Text("资料 · 方法 · 模考 · 错题", 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { Text("大雁四级资料", 18.sp, fontWeight = FontWeight.Bold) }
-        items(books.chunked(2)) { pair ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                pair.forEach { book ->
-                    Card(Modifier.weight(1f), shape = RoundedCornerShape(22.dp)) { Column(Modifier.padding(16.dp)) { Text(book, fontWeight = FontWeight.SemiBold); Spacer(Modifier.height(12.dp)); Text("进度 0%", 12.sp, color = Primary) } }
-                }
-            }
-        }
+        items(books.chunked(2)) { pair -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { pair.forEach { book -> Card(Modifier.weight(1f), shape = RoundedCornerShape(22.dp)) { Column(Modifier.padding(16.dp)) { Text(book, fontWeight = FontWeight.SemiBold); Spacer(Modifier.height(12.dp)); Text("进度 0%", 12.sp, color = Primary) } } } } }
         item { Text("题型方法", 18.sp, fontWeight = FontWeight.Bold, Modifier.padding(top = 8.dp)) }
-        items(types) { type ->
-            Card(shape = RoundedCornerShape(20.dp)) { Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Text(type, fontWeight = FontWeight.SemiBold, Modifier.weight(1f)); Text("查看方法 →", 12.sp, color = Primary) } }
-        }
+        items(types) { type -> Card(shape = RoundedCornerShape(20.dp)) { Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Text(type, fontWeight = FontWeight.SemiBold, Modifier.weight(1f)); Text("查看方法 →", 12.sp, color = Primary) } } }
     }
 }
 
@@ -260,11 +212,7 @@ private fun LibraryScreen() {
 private fun ProfileScreen() {
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("我的", 28.sp, fontWeight = FontWeight.Bold); Text("学习统计与设置", 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                StatCard("学习天数", "0"); StatCard("完成任务", "0"); StatCard("模考次数", "0")
-            }
-        }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) { StatCard("学习天数", "0"); StatCard("完成任务", "0"); StatCard("模考次数", "0") } }
         item { SettingCard("深色模式", "跟随系统") }
         item { SettingCard("动画效果", "开启") }
         item { SettingCard("备考起始时间", "2026-09-14") }
@@ -282,6 +230,3 @@ private fun StatCard(label: String, value: String) {
 private fun SettingCard(title: String, value: String) {
     Card(shape = RoundedCornerShape(20.dp)) { Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Text(title, fontWeight = FontWeight.SemiBold, Modifier.weight(1f)); Text(value, 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
 }
-
-@Composable
-private fun <T> kotlinx.coroutines.flow.Flow<T>.collectAsStateCompat() = androidx.compose.runtime.collectAsState(initial = emptyList<T>())
