@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#f5f5f7" />
+<title>四级打卡日志</title>
+<style>
+:root{
+  --bg:#f5f5f7;--card:rgba(255,255,255,.84);--text:#111114;--muted:#6e6e73;
+  --line:rgba(0,0,0,.07);--accent:#007aff;--green:#34c759;--shadow:0 10px 30px rgba(0,0,0,.07);
+  --radius:24px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:linear-gradient(180deg,#fafafa 0,#f2f2f7 60%,#ededf2 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif;min-height:100vh}
+.app{max-width:760px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom))}
+.header{display:flex;align-items:flex-end;justify-content:space-between;margin:8px 4px 18px}.eyebrow{font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:.2px}.title{font-size:34px;line-height:1.05;letter-spacing:-1.3px;font-weight:800}.date-now{font-size:13px;color:var(--muted);text-align:right}
+.card{background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:rgba(118,118,128,.08);border-radius:18px;padding:13px}.stat .num{font-size:26px;font-weight:800;letter-spacing:-.6px}.stat .lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.section-title{font-size:18px;font-weight:760;letter-spacing:-.2px}.section-sub{font-size:12px;color:var(--muted);margin-top:3px}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 7px 2px;font-weight:600}input,textarea,select{width:100%;border:1px solid var(--line);background:rgba(118,118,128,.06);border-radius:15px;padding:13px 14px;font:inherit;outline:none;color:var(--text);transition:.2s}input:focus,textarea:focus,select:focus{border-color:rgba(0,122,255,.4);box-shadow:0 0 0 4px rgba(0,122,255,.08);background:#fff}textarea{min-height:88px;resize:vertical}
+.tasks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.task{border:1px solid var(--line);background:rgba(118,118,128,.06);border-radius:18px;padding:14px;cursor:pointer;user-select:none;transition:transform .15s,background .2s,border .2s}.task:active{transform:scale(.98)}.task input{display:none}.task.on{background:rgba(52,199,89,.12);border-color:rgba(52,199,89,.26)}.task .ico{font-size:22px}.task .name{font-weight:720;margin-top:7px}.task .hint{font-size:11px;color:var(--muted);margin-top:3px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btns{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.btn{border:0;border-radius:16px;padding:12px 15px;font:inherit;font-weight:720;cursor:pointer}.primary{background:#111;color:#fff}.blue{background:var(--accent);color:#fff}.soft{background:rgba(118,118,128,.1);color:var(--text)}.green{background:var(--green);color:#fff}.danger{background:rgba(255,59,48,.1);color:#d70015}
+.log-list{display:grid;gap:10px;margin-top:12px}.log{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:18px;background:rgba(118,118,128,.06);border:1px solid var(--line)}.log-date{min-width:74px;font-weight:780}.log-main{flex:1}.log-line{display:flex;gap:8px;flex-wrap:wrap}.pill{font-size:11px;padding:5px 8px;border-radius:999px;background:rgba(0,122,255,.1);color:#005ecb;font-weight:700}.pill.green{background:rgba(52,199,89,.12);color:#22863a}.pill.gray{background:rgba(118,118,128,.1);color:#555}.log-note{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.45}.empty{color:var(--muted);font-size:13px;padding:8px 2px}
+.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));width:min(728px,calc(100% - 26px));display:flex;gap:8px;padding:8px;background:rgba(255,255,255,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.75);border-radius:22px;box-shadow:0 12px 35px rgba(0,0,0,.12);z-index:20}.bottom button{flex:1}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.36);display:none;align-items:flex-end;justify-content:center;z-index:30}.sheet{width:min(760px,100%);background:#f8f8fb;border-radius:28px 28px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:86vh;overflow:auto}.handle{width:38px;height:5px;border-radius:999px;background:#d1d1d6;margin:3px auto 15px}.sheet h3{margin:0 0 12px;font-size:20px}.code{background:#111;color:#fff;border-radius:16px;padding:13px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow:auto}
+@media(max-width:560px){.grid{grid-template-columns:repeat(3,1fr)}.tasks{grid-template-columns:1fr 1fr 1fr}.title{font-size:31px}.duo{grid-template-columns:1fr 1fr}.btn{flex:1 1 auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div><div class="eyebrow">CET-4 · 2026.12.12</div><div class="title">打卡日志</div></div>
+    <div class="date-now" id="todayLabel"></div>
+  </div>
+  <div class="card"><div class="grid"><div class="stat"><div class="num" id="streak">0</div><div class="lbl">连续打卡</div></div><div class="stat"><div class="num" id="days">0</div><div class="lbl">累计天数</div></div><div class="stat"><div class="num" id="wordsTotal">0</div><div class="lbl">累计新词</div></div></div></div>
+  <div class="card">
+    <div class="row"><div><div class="section-title">今天</div><div class="section-sub">按当前计划：80词 + 1节语法 + 真题巩固</div></div><div id="statusPill" class="pill gray">未打卡</div></div>
+    <label>日期</label><input id="date" type="date" />
+    <div class="tasks">
+      <label class="task" id="taskWord"><input type="checkbox" id="doneWord"><div class="ico">📖</div><div class="name">单词</div><div class="hint">新词 + 软件复习</div></label>
+      <label class="task" id="taskGrammar"><input type="checkbox" id="doneGrammar"><div class="ico">📚</div><div class="name">语法</div><div class="hint">1节</div></label>
+      <label class="task" id="taskPaper"><input type="checkbox" id="donePaper"><div class="ico">📝</div><div class="name">真题</div><div class="hint">巩固</div></label>
+    </div>
+    <div class="duo"><div><label>新背单词</label><input id="words" type="number" min="0" inputmode="numeric" placeholder="80" /></div><div><label>复习单词</label><input id="reviewWords" type="number" min="0" inputmode="numeric" placeholder="按软件" /></div></div>
+    <label>语法进度</label><input id="grammar" placeholder="例如：第1章 第1节 名词" />
+    <label>真题 / 专项</label><input id="paper" placeholder="例如：2024.12 真题1·仔细阅读" />
+    <label>今天备注</label><textarea id="note" placeholder="哪里不会、哪里效率低、明天需要调整什么……"></textarea>
+    <div class="btns"><button class="btn blue" id="saveBtn">保存打卡</button><button class="btn soft" id="clearBtn">清空本次</button></div>
+  </div>
+  <div class="card"><div class="row"><div><div class="section-title">最近记录</div><div class="section-sub">用于你每天发给我统计</div></div><button class="btn soft" id="openExport">导出</button></div><div class="log-list" id="logList"></div></div>
+</div>
+<div class="bottom"><button class="btn soft" id="importBtn">导入数据</button><button class="btn primary" id="aiBtn">一键生成 AI 统计</button><button class="btn soft" id="resetAllBtn">清空全部</button></div>
+<input type="file" id="fileInput" accept="application/json,.json" style="display:none" />
+<div class="modal" id="modal"><div class="sheet"><div class="handle"></div><h3>发给 AI 的统计数据</h3><div class="code" id="exportText"></div><div class="btns"><button class="btn blue" id="copyBtn">复制</button><button class="btn soft" id="downloadBtn">下载 JSON</button><button class="btn soft" id="closeBtn">关闭</button></div></div></div>
+<script>
+const $=id=>document.getElementById(id);const KEY='cet4_checkin_v1';
+function fmt(d){return d.toISOString().slice(0,10)}function today(){return fmt(new Date())}function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}}function saveAll(a){localStorage.setItem(KEY,JSON.stringify(a))}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]))}
+function setDate(v){$('date').value=v}function fillForm(x){if(!x)return clearForm(false);$('words').value=x.words||'';$('reviewWords').value=x.reviewWords||'';$('grammar').value=x.grammar||'';$('paper').value=x.paper||'';$('note').value=x.note||'';['doneWord','doneGrammar','donePaper'].forEach(id=>{$(id).checked=!!x[id];syncTask($(id))})}
+function clearForm(goToday=true){if(goToday)setDate(today());['words','reviewWords','grammar','paper','note'].forEach(id=>$(id).value='');['doneWord','doneGrammar','donePaper'].forEach(id=>{$(id).checked=false;syncTask($(id))});updateStatus()}
+function syncTask(cb){const map={doneWord:'taskWord',doneGrammar:'taskGrammar',donePaper:'taskPaper'};$(map[cb.id]).classList.toggle('on',cb.checked);updateStatus()}
+['doneWord','doneGrammar','donePaper'].forEach(id=>$(id).addEventListener('change',()=>syncTask($(id))));
+$('date').addEventListener('change',()=>{const x=load().find(i=>i.date===$('date').value);fillForm(x||null);render()});
+function current(){return load().find(i=>i.date===$('date').value)}
+$('saveBtn').onclick=()=>{const date=$('date').value||today();const item={date,words:+$('words').value||0,reviewWords:+$('reviewWords').value||0,grammar:$('grammar').value.trim(),paper:$('paper').value.trim(),note:$('note').value.trim(),doneWord:$('doneWord').checked,doneGrammar:$('doneGrammar').checked,donePaper:$('donePaper').checked};if(!item.words&&!item.reviewWords&&!item.grammar&&!item.paper&&!item.note&&!item.doneWord&&!item.doneGrammar&&!item.donePaper){alert('至少填一项再保存');return}const a=load().filter(i=>i.date!==date);a.push(item);a.sort((x,y)=>y.date.localeCompare(x.date));saveAll(a);render();$('statusPill').textContent='已打卡';$('statusPill').className='pill green'};
+$('clearBtn').onclick=()=>clearForm();$('resetAllBtn').onclick=()=>{if(confirm('确定清空全部打卡记录？此操作不可撤销。')){saveAll([]);clearForm();render()}};$('importBtn').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const incoming=JSON.parse(r.result);if(!Array.isArray(incoming))throw 0;const merged=[...load()];incoming.forEach(it=>{const idx=merged.findIndex(x=>x.date===it.date);if(idx>=0)merged[idx]=it;else merged.push(it)});merged.sort((a,b)=>b.date.localeCompare(a.date));saveAll(merged);setDate(today());fillForm(current());render();alert('导入成功')}catch{alert('JSON格式不正确')}};r.readAsText(f)};
+function calc(){const a=load().slice().sort((x,y)=>x.date.localeCompare(y.date));let streak=0;let cur=new Date();while(true){const d=fmt(cur);if(a.some(x=>x.date===d)){streak++;cur.setDate(cur.getDate()-1)}else break}return {days:a.length,streak,words:a.reduce((s,x)=>s+(+x.words||0),0),reviews:a.reduce((s,x)=>s+(+x.reviewWords||0),0)}}
+function render(){const a=load();const c=calc();$('streak').textContent=c.streak;$('days').textContent=c.days;$('wordsTotal').textContent=c.words;const list=a.slice(0,10);$('logList').innerHTML=list.length?list.map(i=>`<div class="log"><div class="log-date">${escapeHtml(i.date.slice(5))}</div><div class="log-main"><div class="log-line"><span class="pill ${i.doneWord?'green':'gray'}">单词 ${i.words||0}</span><span class="pill ${i.doneGrammar?'green':'gray'}">语法 ${i.doneGrammar?'✓':'—'}</span><span class="pill ${i.donePaper?'green':'gray'}">真题 ${i.donePaper?'✓':'—'}</span></div><div class="log-note">${escapeHtml([i.grammar,i.paper,i.note].filter(Boolean).join(' · ')||'无备注')}</div></div></div>`).join(''):'<div class="empty">还没有记录，从今天开始。</div>';updateStatus()}
+function updateStatus(){const i=current();if(!i){$('statusPill').textContent='未打卡';$('statusPill').className='pill gray';return}const done=i.doneWord&&i.doneGrammar&&i.donePaper;$('statusPill').textContent=done?'完成':'已记录';$('statusPill').className='pill '+(done?'green':'gray')}
+function buildExport(){const a=load().slice().sort((x,y)=>x.date.localeCompare(y.date));const c=calc();return {app:'CET4 Check-in Log',examDate:'2026-12-12',goal:'425+',summary:c,records:a}}
+function buildText(){const x=buildExport();return `英语四级打卡统计\n考试：2026-12-12\n目标：425+\n累计打卡：${x.summary.days} 天\n连续打卡：${x.summary.streak} 天\n累计新词：${x.summary.words}\n累计复习词：${x.summary.reviews}\n\n最近记录：\n`+x.records.slice(-14).reverse().map(i=>`${i.date}｜新词${i.words||0}｜复习${i.reviewWords||0}｜语法：${i.grammar||'—'}｜真题：${i.paper||'—'}｜备注：${i.note||'—'}`).join('\n')+`\n\n请根据以上数据统计：1.完成率 2.单词累计与平均 3.语法进度 4.真题进度 5.明显问题 6.明天建议任务量。`}
+$('aiBtn').onclick=()=>{$('exportText').textContent=buildText();$('modal').style.display='flex'};$('openExport').onclick=()=>$('aiBtn').click();$('closeBtn').onclick=()=>$('modal').style.display='none';$('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('modal').style.display='none'});
+$('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText($('exportText').textContent);$('copyBtn').textContent='已复制 ✓'}catch{alert('复制失败，请长按文本复制')}};setTimeout(()=>$('copyBtn').textContent='复制',1200);
+$('downloadBtn').onclick=()=>{const blob=new Blob([JSON.stringify(buildExport(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`cet4-checkin-${today()}.json`;a.click();URL.revokeObjectURL(a.href)};
+setDate(today());fillForm(current());render();$('todayLabel').textContent=new Date().toLocaleDateString('zh-CN',{month:'numeric',day:'numeric',weekday:'short'});
+</script>
+</body>
+</html>
