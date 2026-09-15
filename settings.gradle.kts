@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CET4Prep"
 include(":app")
+include(":checkinapp")
